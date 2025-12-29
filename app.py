@@ -35,7 +35,7 @@ num_variations = st.sidebar.slider("Number of Variations", 1, 5, 1, 1)
 st.markdown("Upload an image to generate captions using BLIP.")
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-
+generate_button = None
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_column_width=True)
