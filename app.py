@@ -3,8 +3,6 @@ from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
 import numpy as np
 
-### DO NOT EDIT IMPORTS ABOVE THIS LINE ###
-
 # -----------------------------------------------------------------------------
 # STEP 1: MODEL LOADING
 # -----------------------------------------------------------------------------
@@ -13,7 +11,6 @@ def load_caption_model():
     processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
     model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
     return processor, model
-
 processor, model = load_caption_model()
 
 
@@ -31,30 +28,21 @@ num_variations = st.sidebar.slider("Number of Variations", 1, 5, 1, 1)
 # -----------------------------------------------------------------------------
 # STEP 3: MAIN PIPELINE
 # -----------------------------------------------------------------------------
-
 st.markdown("Upload an image to generate captions using BLIP.")
-
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 generate_button = None
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_column_width=True)
-    
-    # Optional starting text
     start_text = st.text_input("Optional starting text:")
-    
     generate_button = st.button("Generate Caption")
-
 
 if generate_button:
     with st.spinner("Generating caption(s)..."):
-        # Preprocess image (and optional text)
         if start_text:
             inputs = processor(images=image, text=start_text, return_tensors="pt")
         else:
             inputs = processor(images=image, return_tensors="pt")
-
-        # Loop for multiple variations
         for i in range(num_variations):
             out = model.generate(
                 **inputs,
@@ -64,9 +52,5 @@ if generate_button:
                 temperature=temperature,
                 top_k=50
             )
-            
-            # Decode output
             caption_text = processor.decode(out[0], skip_special_tokens=True)
-            
-            # Display caption
             st.write(f"{i+1}. {caption_text}")
